@@ -1,0 +1,103 @@
+#该代码目前只能将样例中的103||27||29||23||24与109 = 30 + 30 + 24 + 25形式的信息看作有效信息，时间有限，仍有较大的完善空间。
+import re
+file_path = 'test.txt'
+output_path = 'Cleaned_test.txt'
+
+with open(output_path,'w',encoding='utf-8') as f:
+    f.write('创建这个文件夹用来装载清洗过的数据')
+
+#任务一：分析一行数据属于托福还是雅思成绩
+def TForYS(data):
+    #该函数对每一行的数据进行判定，判断是托福成绩，雅思成绩，还是无效数据
+    if(data == 'None'):return 'trash'
+    else:
+        match = re.fullmatch(r'^[\d.]+\|\|[\d.]+\|\|[\d.]+\|\|[\d.]+\|\|[\d.]+$', data)
+        if match:
+        #进一步判断是托福还是雅思
+            numbers = list(map(float, data.split('||')))
+            first_num, *rest_nums = numbers
+            *first_four, last_num = numbers
+            if abs(sum(rest_nums) - first_num) < 1e-6:
+                return 'TF'
+            elif abs(sum(first_four) - last_num) < 1e-6:
+                return 'TF'
+            if abs(sum(rest_nums) - first_num * 4) < 1e-6:
+                return 'YS'
+            elif abs(sum(first_four) - last_num * 4) < 1e-6:
+                return 'YS'
+            else:
+                return 'trash'
+        Match = re.fullmatch(r'^(\d+)\+(\d+)\+(\d+)\+(\d+)=(\d+)$',data)
+        is_valid = 0
+        if Match:
+            a, b, c, d, e = map(int, Match.groups())
+            is_valid = (a + b + c + d) == e
+        else:
+            Match = re.fullmatch(r'^(\d+)=(\d+)\+(\d+)\+(\d+)\+(\d+)$',data)
+            if Match:
+                a, b, c, d, e = map(int, Match.groups())
+                is_valid = (e + b + c + d) == a
+        if is_valid:
+            return 'TF'
+    return 'trash'
+#任务二：如果有雅思或者托福成绩，提取出他们的总分和小分
+def getGrade(data):
+    if TForYS(data)in('TF','YS'):
+        match = re.fullmatch(r'^\d+\|\|\d+\|\|\d+\|\|\d+\|\|\d+$', data)
+        if match:
+            numbers = list(map(int, data.split('||')))
+            first_num, *rest_nums = numbers
+            *first_four, last_num = numbers
+            if abs(sum(rest_nums) - first_num) < 1e-6:
+                print('托福成绩，总分'+ str(first_num))
+                print('小分' + str(rest_nums))
+            elif abs(sum(first_four) - last_num) < 1e-6:
+                print('托福成绩，总分'+ str(last_num))
+                print('小分' + str(first_four))
+            if abs(sum(rest_nums) - first_num * 4) < 1e-6:
+                print('雅思成绩，总分'+str(first_num))
+                print('小分'+ str(rest_nums))
+            elif abs(sum(first_four) - last_num * 4) < 1e-6:
+                print('雅思成绩，总分'+str(last_num))
+                print('小分'+str(first_four))
+        Match = re.fullmatch(r'^(\d+)\+(\d+)\+(\d+)\+(\d+)=(\d+)$', data)
+        if Match:
+            a, b, c, d, e = map(int, Match.groups())
+            if(a+b+c+d == e):
+                print('托福成绩，总分'+ str(e))
+                print(f'小分 {a}, {b}, {c}, {d}')
+            else:
+                Match = re.fullmatch(r'^(\d+)=(\d+)\+(\d+)\+(\d+)\+(\d+)$', data)
+                if Match:
+                    a, b, c, d, e = map(int, Match.groups())
+                    if(e+b+c+d ==a):
+                        print('托福成绩，总分' + str(a))
+                        print(f'小分 {b}, {c}, {d}, {e}')
+#任务三，四：清理数据，记录有效数据占比，托福成绩占比，雅思成绩占比
+def txtClean(file_path,output_path):
+    valid_num =0 #记录有效数据数量
+    line_sum = 0 #记录总数据量
+    TF_num =0 #记录托福成绩数量
+    YS_num =0 #记录雅思成绩数量
+    with open(file_path, 'r+', encoding='utf-8') as file,\
+         open(output_path,'w',encoding='utf-8') as out_file:
+        for line in file:
+            line = line.strip()
+            if(TForYS(line)=='TF'):
+                valid_num+=1
+                TF_num+=1
+                out_file.write(line + '\n')
+            elif(TForYS(line)=='YS'):
+                valid_num+=1
+                YS_num+=1
+                out_file.write(line + '\n')
+            line_sum+=1
+            getGrade(line)
+    valid_percent = valid_num / line_sum *100
+    TF_percent = TF_num / line_sum *100
+    YS_percent = YS_num / line_sum *100
+    print('有效数据有'+str(valid_num)+'行，'+'有效数据占比为'+str(valid_percent)+'%')
+    print('托福成绩有'+str(TF_num)+'行，'+'托福成绩占比为'+str(TF_percent)+'%')
+    print('雅思成绩有'+str(YS_num)+'行，'+'雅思成绩占比为'+str(YS_percent)+'%')
+
+txtClean(file_path,output_path)
