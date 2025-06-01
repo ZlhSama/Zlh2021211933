@@ -9,6 +9,7 @@ with open(output_path,'w',encoding='utf-8') as f:
 #任务一：分析一行数据属于托福还是雅思成绩
 def TForYS(data):
     #该函数对每一行的数据进行判定，判断是托福成绩，雅思成绩，还是无效数据
+    #对该部分代码进行补充，要求其能够在此基础上识别更多的符合要求的模式，来提取更加完备的成绩数据
     if(data == 'None'):return 'trash'
     else:
         match = re.fullmatch(r'^[\d.]+\|\|[\d.]+\|\|[\d.]+\|\|[\d.]+\|\|[\d.]+$', data)
