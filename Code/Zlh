@@ -18,7 +18,7 @@ def TForYS(data):
             numbers = list(map(float, data.split('||')))
             first_num, *rest_nums = numbers
             *first_four, last_num = numbers
-            if abs(sum(rest_nums) - first_num) < 1e-6:
+            if abs(sum(rest_nums) - first_num) <= 1e-6:
                 return 'TF'
             elif abs(sum(first_four) - last_num) < 1e-6:
                 return 'TF'
