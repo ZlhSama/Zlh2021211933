@@ -20,7 +20,7 @@ def TForYS(data):
             *first_four, last_num = numbers
             if abs(sum(rest_nums) - first_num) <= 1e-6:
                 return 'TF'
-            elif abs(sum(first_four) - last_num) < 1e-6:
+            elif abs(sum(first_four) - last_num) <= 1e-6:
                 return 'TF'
             if abs(sum(rest_nums) - first_num * 4) < 1e-6:
                 return 'YS'
